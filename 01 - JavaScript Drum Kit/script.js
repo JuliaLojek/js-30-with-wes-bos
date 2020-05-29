@@ -1,13 +1,21 @@
-var keys = document.querySelector(".keys");
-function play(event) {
-    var activeElKeyAttr = event.keyCode.toString();
-    var activeEl = keys.querySelector("[data-key=\"" + activeElKeyAttr + "\"]");
-    if (!activeEl) {
+var keys = document.querySelectorAll(".key");
+function removePlayingClass(event) {
+    if (event.propertyName !== "transform") {
         return;
     }
-    activeEl.classList.add("playing");
-    setTimeout(function () { return activeEl.classList.remove("playing"); }, 200);
-    var activeAudioEl = document.querySelector("audio[data-key=\"" + activeElKeyAttr + "\"]");
-    activeAudioEl.play();
+    this.classList.remove("playing");
 }
-window.addEventListener("keydown", function (event) { return play(event); });
+function play(event) {
+    var keyEl = document.querySelector(".key[data-key=\"" + event.keyCode + "\"]");
+    var audioEl = document.querySelector("audio[data-key=\"" + event.keyCode + "\"]");
+    if (!keyEl) {
+        return;
+    }
+    keyEl.classList.add("playing");
+    audioEl.currentTime = 0; // it will start the sound again even while it's still playing
+    audioEl.play();
+}
+keys.forEach(function (key) {
+    key.addEventListener("transitionend", removePlayingClass);
+});
+window.addEventListener("keydown", play);
